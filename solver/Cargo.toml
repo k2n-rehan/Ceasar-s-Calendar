@@ -1,9 +1,0 @@
-[package]
-name = "a-puzzle-a-day-lib"
-version = "0.1.0"
-authors = ["Rehan Khan"]
-edition = "2025"
-
-[dependencies]
-anyhow = "1.0"
-getopts = "0.2"
