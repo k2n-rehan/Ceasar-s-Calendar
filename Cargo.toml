@@ -1,0 +1,15 @@
+[package]
+name = "a-puzzle-a-day-solver"
+version = "0.1.0"
+authors = ["Keiichi Watanabe <udon.watanabe@gmail.com>"]
+edition = "2018"
+
+[workspace]
+members = [ "cli", "solver" ]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+a-puzzle-a-day-lib = { path = "solver" }
+wasm-bindgen = "0.2.74"
