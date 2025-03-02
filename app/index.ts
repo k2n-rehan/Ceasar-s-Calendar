@@ -96,7 +96,7 @@ function addOptions() {
     w_form.disabled = true;
 
     const p_form =<HTMLSelectElement>document.getElementById(PUZZLE_TYPE_FORM_ID);
-    ["WeekDay Calendar Puzzle", "Month Calendar"].forEach(typ => {
+    ["A-Puzzle-A-Day", "Calendar Puzzle", "WeekDay Calendar Puzzle"].forEach(typ => {
         const opt = document.createElement("option");
         opt.text = typ;
         p_form.add(opt);
