@@ -52,6 +52,6 @@ jobs:
         if: success()
         uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
           branch: gh-pages
           folder: public
