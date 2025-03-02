@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
     <head>
         <meta charset="utf-8">
         <link rel="icon" type="image/png" href="favicon.png" sizes="16x16 24x24 32x32 48x48 64x64" />
@@ -12,7 +11,6 @@
         <script src="https://kit.fontawesome.com/ed26fd5425.js" crossorigin="anonymous"></script>
         <title>Ceasar's Calendar</title>
     </head>
-
     <body>
         <nav class="navbar navbar-expand-xs navbar-light bg-light">
             <div class="container-fluid">
@@ -20,14 +18,13 @@
                     <img src="favicon.png" width="30" class="d-inline-block align-top" alt="logo image">
                     Ceasar's Calendar
                 </a>
-                <a class="d-flex navbar-brand icon-link" href="https://k2n-rehan.github.io/Ceasar-s-Calendar/"><i
-                                                                                                                       class="fa fa-github" aria-hidden="true"></i></a>
+                <a class="d-flex navbar-brand icon-link" href="https://k2n-rehan.github.io/Ceasar-s-Calendar/">
+                    <i class="fa fa-github" aria-hidden="true"></i>
+                </a>
             </div>
         </nav>
-
         <main>
             <div class="container" id="main-container">
-            
                 <div class="row">
                     <div class="col-xs-12 col-md-6">
                         <select class="col-md-1 form-select" id="month-form"></select>
@@ -37,9 +34,10 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-12 col-md-6">
+                    <!-- Removed the puzzle type dropdown -->
+                    <!-- <div class="col-xs-12 col-md-6">
                         <select class="col-md-1 form-select" id="puzzle-type-form"></select>
-                    </div>
+                    </div> -->
                     <div class="col-xs-12 col-md-6">
                         <select class="col-md-1 form-select" id="weekday-form"></select>
                     </div>
@@ -53,12 +51,10 @@
                 <div id="board"></div>
                 <table id="board-table"></table>
             </div>
-
         </main>
         <script src="./dist/main.js"></script>
     </body>
     <footer class="text-lg-start bg-light text-muted bg-light">
         Developed by Rehan Khan.....!
     </footer>
-
 </html>
