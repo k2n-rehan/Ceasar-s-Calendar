@@ -1,38 +1,28 @@
 import './style.scss';
 
-// Note that a dynamic `import` statement here is required due to
-// webpack/webpack#6615, but in theory `import { greet } from './pkg';`
-// will work here one day as well!
+// Load Rust WebAssembly module
 const rust = import('../public/pkg/index');
 
-const HINT_ID: string = "hint";
-const BOARD_TABLE_ID: string = "board-table";
-const MONTH_FORM_ID: string = "month-form";
-const DAY_FORM_ID: string = "day-form";
-const WEEKDAY_FORM_ID: string = "weekday-form";
-const PUZZLE_TYPE_FORM_ID: string = "puzzle-type-form";
-const SOLVE_BUTTON_ID: string = "solve-button";
-
-enum PuzzleType {
-    WeekDay
-}
+const HINT_ID = "hint";
+const BOARD_TABLE_ID = "board-table";
+const MONTH_FORM_ID = "month-form";
+const DAY_FORM_ID = "day-form";
+const WEEKDAY_FORM_ID = "weekday-form";
+const SOLVE_BUTTON_ID = "solve-button";
 
 function buttonOnClick() {
-    const m_form =<HTMLSelectElement>document.getElementById(MONTH_FORM_ID);
+    const m_form = <HTMLSelectElement>document.getElementById(MONTH_FORM_ID);
     const month = m_form.selectedIndex + 1;
-    const d_form =<HTMLSelectElement>document.getElementById(DAY_FORM_ID);
+    const d_form = <HTMLSelectElement>document.getElementById(DAY_FORM_ID);
     const day = d_form.selectedIndex + 1;
-    const w_form =<HTMLSelectElement>document.getElementById(WEEKDAY_FORM_ID);
+    const w_form = <HTMLSelectElement>document.getElementById(WEEKDAY_FORM_ID);
     const weekday = w_form.selectedIndex;
-    const p_form =<HTMLSelectElement>document.getElementById(PUZZLE_TYPE_FORM_ID);
-    const puzzle_type = p_form.selectedIndex;
-
+    
     resetBoard();
-
-    callSolver(month, day, weekday, puzzle_type).then(result => {
+    callSolver(month, day, weekday).then(result => {
         console.log(result);
         renderTable(month, day, weekday, result);
-    })
+    });
 }
 
 function resetBoard() {
@@ -40,17 +30,15 @@ function resetBoard() {
     hint.innerText = "";
 }
 
-async function callSolver(month: number, day: number, weekday: number, puzzle_type: PuzzleType): Promise<string> {
+async function callSolver(month: number, day: number, weekday: number): Promise<string> {
     if (!(1 <= month && month <= 12 && 1 <= day && day <= 31 && 0 <= weekday && weekday < 7)) {
-
-        throw new Error("Error: invalid date: " + month + ", " + day);
+        throw new Error(`Error: invalid date: ${month}, ${day}`);
     }
 
-    // If there is a solution without flipping, return it.
     let r = await rust.then(m => {
-        return m.find_solution(month, day, weekday, puzzle_type, false /* allow_flip */);
+        return m.find_solution(month, day, weekday, 3, false /* allow_flip */);
     });
-    if (r != "") {
+    if (r !== "") {
         return r;
     }
 
@@ -58,7 +46,7 @@ async function callSolver(month: number, day: number, weekday: number, puzzle_ty
     hint.innerText = "(No solution without flipping pieces.)";
 
     return await rust.then(m => {
-        return m.find_solution(month, day, weekday, puzzle_type, true);
+        return m.find_solution(month, day, weekday, 3, true);
     });
 }
 
@@ -67,7 +55,7 @@ function addOptions() {
     const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const today = new Date();
 
-    const m_form =<HTMLSelectElement>document.getElementById(MONTH_FORM_ID);
+    const m_form = <HTMLSelectElement>document.getElementById(MONTH_FORM_ID);
     months.forEach(m => {
         const opt = document.createElement("option");
         opt.text = m;
@@ -75,7 +63,7 @@ function addOptions() {
     });
     m_form.selectedIndex = today.getMonth();
 
-    const d_form =<HTMLSelectElement>document.getElementById(DAY_FORM_ID);
+    const d_form = <HTMLSelectElement>document.getElementById(DAY_FORM_ID);
     for (let i = 1; i <= 31; i++) {
         const opt = document.createElement("option");
         opt.text = i.toString();
@@ -83,32 +71,13 @@ function addOptions() {
     }
     d_form.selectedIndex = today.getDate() - 1;
 
-    const w_form =<HTMLSelectElement>document.getElementById(WEEKDAY_FORM_ID);
+    const w_form = <HTMLSelectElement>document.getElementById(WEEKDAY_FORM_ID);
     weekdays.forEach(w => {
         const opt = document.createElement("option");
         opt.text = w;
         w_form.add(opt);
     });
     w_form.selectedIndex = today.getDay();
-    w_form.disabled = true;
-
-    const p_form =<HTMLSelectElement>document.getElementById(PUZZLE_TYPE_FORM_ID);
-    ["WeekDay Calendar Puzzle"].forEach(typ => {
-        const opt = document.createElement("option");
-        opt.text = typ;
-        p_form.add(opt);
-    });
-    p_form.selectedIndex = 0;
-}
-
-function onChangePuzzleType() {
-    const p_form =<HTMLSelectElement>document.getElementById(PUZZLE_TYPE_FORM_ID);
-    const w_form =<HTMLSelectElement>document.getElementById(WEEKDAY_FORM_ID);
-    if (p_form.selectedIndex == PuzzleType.WeekDay) {
-        w_form.disabled = false;
-    } else {
-        w_form.disabled = true;
-    }
 }
 
 function renderTable(month: number, day: number, weekday: number, board_str: string) {
@@ -134,12 +103,12 @@ function renderTable(month: number, day: number, weekday: number, board_str: str
     let board = [];
     for (const l of board_str.trim().split("\n")) {
         const cs = l.trim().split(" ");
-        if (cs.length != WIDTH) {
+        if (cs.length !== WIDTH) {
             console.log("unexpected board width: ", cs);
         }
         board.push(cs);
     }
-    if (board.length != HEIGHT) {
+    if (board.length !== HEIGHT) {
         console.log("unexpected board height: ", board.length, board);
     }
 
@@ -155,23 +124,19 @@ function renderTable(month: number, day: number, weekday: number, board_str: str
             div.style.backgroundColor = color;
 
             if (board[i][j] === "M") {
-                div.innerText = MONTHS[month-1].toString();
+                div.innerText = MONTHS[month-1];
             } else if (board[i][j] === "D") {
                 div.innerText = day.toString();
-            }else if (board[i][j] === "W") {
-                div.innerText = WEEKDAYS[weekday].toString();
+            } else if (board[i][j] === "W") {
+                div.innerText = WEEKDAYS[weekday];
             }
-
             cell.appendChild(div);
         }
     }
 }
 
-
 function initialize() {
-    document.getElementById(PUZZLE_TYPE_FORM_ID).onchange=onChangePuzzleType;
-    document.getElementById(SOLVE_BUTTON_ID).onclick=buttonOnClick;
-
+    document.getElementById(SOLVE_BUTTON_ID).onclick = buttonOnClick;
     addOptions();
 }
 
