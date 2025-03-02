@@ -1,8 +1,8 @@
 [package]
 name = "a-puzzle-a-day-solver"
 version = "0.1.0"
-authors = ["Keiichi Watanabe <udon.watanabe@gmail.com>"]
-edition = "2018"
+authors = ["Rehan Khan"]
+edition = "2025"
 
 [workspace]
 members = [ "cli", "solver" ]
