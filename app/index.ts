@@ -14,9 +14,6 @@ const PUZZLE_TYPE_FORM_ID: string = "puzzle-type-form";
 const SOLVE_BUTTON_ID: string = "solve-button";
 
 enum PuzzleType {
-    DragonFjord,
-    JarringWords,
-    Tetromino,
     WeekDay
 }
 
@@ -96,7 +93,7 @@ function addOptions() {
     w_form.disabled = true;
 
     const p_form =<HTMLSelectElement>document.getElementById(PUZZLE_TYPE_FORM_ID);
-    ["DragonFjord's A-Puzzle-A-Day", "JarringWords's Calendar Puzzle", "Tetromino-type Calendar Puzzle", "WeekDay Calendar Puzzle"].forEach(typ => {
+    ["WeekDay Calendar Puzzle"].forEach(typ => {
         const opt = document.createElement("option");
         opt.text = typ;
         p_form.add(opt);
