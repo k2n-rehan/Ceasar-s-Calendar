@@ -1,0 +1,57 @@
+name: Deploy
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.2.0
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: clippy
+
+      - name: Run Clippy (Rust linter)
+        run: cargo clippy --all-features --all-targets --workspace -- -D warnings
+
+      - name: Run Rust tests
+        run: cargo test --workspace
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Install npm dependencies & build
+        run: |
+          npm ci
+          npm run release-build
+          rm ./public/pkg/.gitignore
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: JamesIves/github-pages-deploy-action@4.1.7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: public
